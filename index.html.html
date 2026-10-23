@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Health & Specs - Motor JGB37-520</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        h2, h3 { margin-top: 0; color: #1a252f; }
+        .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px; }
+        .spec-item { background: #f8f9fa; padding: 8px; border-radius: 5px; }
+        .spec-label { font-weight: bold; color: #555; }
+        .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .metric-card { background: #eef2f7; padding: 15px; border-radius: 8px; text-align: center; }
+        .metric-value { font-size: 22px; font-weight: bold; color: #007bff; margin-top: 5px; }
+        .status-ok { color: #28a745; font-weight: bold; }
+    </style>
+
+    <!-- Firebase Web SDK (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+    <!-- 1. PERMANENT / STATIC MOTOR DETAILS -->
+    <div class="card">
+        <h2>⚙️ Asset Specifications</h2>
+        <div class="spec-grid">
+            <div class="spec-item"><span class="spec-label">Asset ID:</span> MTR-JGB37-01</div>
+            <div class="spec-item"><span class="spec-label">Model:</span> JGB37-520 DC Gear</div>
+            <div class="spec-item"><span class="spec-label">Rated Voltage:</span> 12V DC</div>
+            <div class="spec-item"><span class="spec-label">Rated Current:</span> 2.0 A</div>
+            <div class="spec-item"><span class="spec-label">Max Speed:</span> 300 RPM</div>
+            <div class="spec-item"><span class="spec-label">Status:</span> <span class="status-ok">OPERATIONAL</span></div>
+        </div>
+    </div>
+
+    <!-- 2. LIVE FIREBASE TELEMETRY -->
+    <div class="card">
+        <h3>📊 Live Telemetry (Realtime)</h3>
+        <div class="telemetry-grid">
+            <div class="metric-card">
+                <div>Temperature</div>
+                <div class="metric-value" id="tempVal">-- °C</div>
+            </div>
+            <div class="metric-card">
+                <div>Vibration</div>
+                <div class="metric-value" id="vibVal">-- m/s²</div>
+            </div>
+            <div class="metric-card">
+                <div>Current</div>
+                <div class="metric-value" id="currVal">-- A</div>
+            </div>
+            <div class="metric-card">
+                <div>Acoustics</div>
+                <div class="metric-value" id="soundVal">-- dB</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE WITH YOUR FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Listen to Live Sensor Data for Motor JGB37-520
+        db.ref("motors/JGB37_520").on("value", (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById("tempVal").innerText = (data.temperature || "--") + " °C";
+                document.getElementById("vibVal").innerText = (data.vibration || "--") + " m/s²";
+                document.getElementById("currVal").innerText = (data.current || "--") + " A";
+                document.getElementById("soundVal").innerText = (data.sound || "--") + " dB";
+            }
+        });
+    </script>
+</body>
+</html>
